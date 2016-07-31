@@ -15,7 +15,7 @@ public class Article {
     String webUrl;
     String headline;
     String thumbnail;
-    public final String BASE_URL = "http://www.nytimes.com/";
+    public String BASE_URL = "http://www.nytimes.com/";
 
     public String getThumbnail() {
         return BASE_URL + thumbnail;

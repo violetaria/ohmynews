@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
@@ -20,6 +21,7 @@ import android.widget.Toast;
 import com.getlosthere.ohmynews.R;
 import com.getlosthere.ohmynews.adapters.ArticleArrayAdapter;
 import com.getlosthere.ohmynews.clients.NewsAPIClient;
+import com.getlosthere.ohmynews.fragments.FilterFragment;
 import com.getlosthere.ohmynews.listeners.EndlessScrollListener;
 import com.getlosthere.ohmynews.models.Article;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -36,7 +38,7 @@ import java.util.Calendar;
 
 import cz.msebera.android.httpclient.Header;
 
-public class SearchActivity extends AppCompatActivity {
+public class SearchActivity extends AppCompatActivity implements FilterFragment.FilterListener{
 //    EditText etQuery;
     GridView gvResults;
 //    Button btnSearch;
@@ -197,18 +199,10 @@ public class SearchActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.miFilter) {
-            Intent i = new Intent(SearchActivity.this, FilterActivity.class);
-
-            i.putExtra("sort_order",filterSortOrder);
-            i.putExtra("date",filterDate);
-            i.putExtra("sports",filterSports);
-            i.putExtra("fashion",filterFashion);
-            i.putExtra("arts",filterArts);
-            i.putExtra("code",REQUEST_CODE);
-
-            startActivityForResult(i,REQUEST_CODE);
+            FragmentManager fm = getSupportFragmentManager();
+            FilterFragment filterDialogFragment = FilterFragment.newInstance("Filter Settings",filterSortOrder,filterDate,filterArts,filterFashion,filterSports);
+            filterDialogFragment.show(fm, "fragment_filter");
             return true;
         }
 
@@ -244,39 +238,8 @@ public class SearchActivity extends AppCompatActivity {
         return false;
     }
 
-//    public void onArticleSearch(View view) {
-//        RequestParams params = setupParams(0);
-//
-//        if (isNetworkAvailable() && isOnline()) {
-//            NewsAPIClient.get("articlesearch.json", params, new JsonHttpResponseHandler() {
-//                @Override
-//                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-//                    Log.d("DEBUG", response.toString());
-//
-//                    JSONArray articleJSONResults = null;
-//
-//                    try {
-//                        articleJSONResults = response.getJSONObject("response").getJSONArray("docs");
-//                        adapter.clear();
-//                        adapter.addAll(Article.fromJSONArray(articleJSONResults));
-//                    } catch (JSONException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//
-//                @Override
-//                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-//                    super.onFailure(statusCode, headers, throwable, errorResponse);
-//                }
-//            });
-//        } else {
-//            Toast.makeText(getApplicationContext(), "Please check your internet connection", Toast.LENGTH_LONG).show();
-//        }
-//    }
 
     public RequestParams setupParams(int page){
-//        String query = etQuery.getText().toString();
-
         RequestParams p = new RequestParams();
         p.put("page",page);
         p.put("q",currentQuery);
@@ -302,4 +265,14 @@ public class SearchActivity extends AppCompatActivity {
         }
         return p;
     }
+
+    @Override
+    public void  onFinishedFilterDialog(String sortOrder, Long date, boolean arts, boolean fashion, boolean sports) {
+        filterArts = arts;
+        filterSports = sports;
+        filterFashion = fashion;
+        filterSortOrder = sortOrder;
+        filterDate = date;
+    }
+
 }

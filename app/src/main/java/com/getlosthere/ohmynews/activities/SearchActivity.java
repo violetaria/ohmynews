@@ -8,21 +8,23 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.GridView;
 import android.widget.Toast;
 
 import com.getlosthere.ohmynews.R;
-import com.getlosthere.ohmynews.adapters.ArticleArrayAdapter;
+import com.getlosthere.ohmynews.adapters.ArticleAdapter;
 import com.getlosthere.ohmynews.clients.NewsAPIClient;
 import com.getlosthere.ohmynews.fragments.FilterFragment;
-import com.getlosthere.ohmynews.listeners.EndlessScrollListener;
+import com.getlosthere.ohmynews.helpers.ItemClickSupport;
+import com.getlosthere.ohmynews.listeners.EndlessRecyclerViewScrollListener;
 import com.getlosthere.ohmynews.models.Article;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -39,15 +41,12 @@ import java.util.Calendar;
 import cz.msebera.android.httpclient.Header;
 
 public class SearchActivity extends AppCompatActivity implements FilterFragment.FilterListener{
-//    EditText etQuery;
-    GridView gvResults;
-//    Button btnSearch;
-
     ArrayList<Article> articles;
-    ArticleArrayAdapter adapter;
+    ArticleAdapter adapter;
+    RecyclerView rvResults;
 
     // variables to hold filters
-    private String filterSortOrder = "Oldest";
+    private String filterSortOrder = "Choose Sort Order";
     private long filterDate = -1;
     private boolean filterArts = false;
     private boolean filterFashion = false;
@@ -61,7 +60,6 @@ public class SearchActivity extends AppCompatActivity implements FilterFragment.
         setContentView(R.layout.activity_search);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        // Display icon in the toolbar
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setLogo(R.drawable.news);
         getSupportActionBar().setDisplayUseLogoEnabled(true);
@@ -70,17 +68,17 @@ public class SearchActivity extends AppCompatActivity implements FilterFragment.
     }
 
     public void setupViews() {
-//        etQuery = (EditText) findViewById(R.id.etQuery);
-        gvResults = (GridView) findViewById(R.id.gvResults);
-//        btnSearch = (Button) findViewById(R.id.btnSearch);
+        rvResults = (RecyclerView) findViewById(R.id.rvResults);
         articles = new ArrayList<>();
-        adapter = new ArticleArrayAdapter(this, articles);
-        gvResults.setAdapter(adapter);
+        adapter = new ArticleAdapter(this, articles);
+        rvResults.setAdapter(adapter);
+        StaggeredGridLayoutManager gridLayoutManager =
+                new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL);
+        rvResults.setLayoutManager(gridLayoutManager);
 
-        // hook up listener for grid click
-        gvResults.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        ItemClickSupport.addTo(rvResults).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemClicked(RecyclerView recyclerView, int position, View v) {
                 // create intent
                 Intent i = new Intent(getApplicationContext(), ArticleActivity.class);
 
@@ -95,14 +93,10 @@ public class SearchActivity extends AppCompatActivity implements FilterFragment.
             }
         });
 
-        gvResults.setOnScrollListener(new EndlessScrollListener() {
+        rvResults.addOnScrollListener(new EndlessRecyclerViewScrollListener(gridLayoutManager) {
             @Override
-            public boolean onLoadMore(int page, int totalItemsCount) {
-                // Triggered only when new data needs to be appended to the list
-                // Add whatever code is needed to append new items to your AdapterView
-                int articleCount = adapter.getCount();
+            public void onLoadMore(int page, int totalItemsCount) {
                 loadNewsPageFromAPI(page);
-                return adapter.getCount() > articleCount;
             }
         });
     }
@@ -119,8 +113,10 @@ public class SearchActivity extends AppCompatActivity implements FilterFragment.
                     try {
                         articleJSONResults = response.getJSONObject("response").getJSONArray("docs");
                         if (articleJSONResults.length() > 0) {
-                            adapter.addAll(Article.fromJSONArray(articleJSONResults));
-                            adapter.notifyDataSetChanged();
+                            int origCount = adapter.getItemCount();
+                            ArrayList<Article> newArticles = Article.fromJSONArray(articleJSONResults);
+                            articles.addAll(newArticles);
+                            adapter.notifyItemRangeInserted(origCount,newArticles.size());
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -148,32 +144,40 @@ public class SearchActivity extends AppCompatActivity implements FilterFragment.
             @Override
             public boolean onQueryTextSubmit(String query) {
                 currentQuery = query;
-                RequestParams params = setupParams(0);
-
-                if (isNetworkAvailable() && isOnline()) {
-                    NewsAPIClient.get("articlesearch.json", params, new JsonHttpResponseHandler() {
-                        @Override
-                        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                            Log.d("DEBUG", response.toString());
-
-                            JSONArray articleJSONResults = null;
-
-                            try {
-                                articleJSONResults = response.getJSONObject("response").getJSONArray("docs");
-                                adapter.clear();
-                                adapter.addAll(Article.fromJSONArray(articleJSONResults));
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                            super.onFailure(statusCode, headers, throwable, errorResponse);
-                        }
-                    });
+                if(currentQuery.isEmpty() || currentQuery == ""){
+                    Toast.makeText(getApplicationContext(), "Oops, the search was blank!  Try again.", Toast.LENGTH_LONG).show();
                 } else {
-                    Toast.makeText(getApplicationContext(), "Please check your internet connection", Toast.LENGTH_LONG).show();
+                    RequestParams params = setupParams(0);
+
+                    if (isNetworkAvailable() && isOnline()) {
+                        NewsAPIClient.get("articlesearch.json", params, new JsonHttpResponseHandler() {
+                            @Override
+                            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                                Log.d("DEBUG", response.toString());
+
+                                JSONArray articleJSONResults = null;
+
+                                try {
+                                    articleJSONResults = response.getJSONObject("response").getJSONArray("docs");
+                                    int origCount = adapter.getItemCount();
+                                    ArrayList<Article> newArticles = Article.fromJSONArray(articleJSONResults);
+                                    articles.clear();
+                                    adapter.notifyItemRangeRemoved(0,origCount);
+                                    articles.addAll(newArticles);
+                                    adapter.notifyItemRangeInserted(0,newArticles.size());
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                                super.onFailure(statusCode, headers, throwable, errorResponse);
+                            }
+                        });
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Please check your internet connection", Toast.LENGTH_LONG).show();
+                    }
                 }
 
                 // workaround to avoid issues with some emulators and keyboard devices firing twice if a keyboard enter is used
@@ -243,7 +247,9 @@ public class SearchActivity extends AppCompatActivity implements FilterFragment.
         RequestParams p = new RequestParams();
         p.put("page",page);
         p.put("q",currentQuery);
-        p.put("sort",filterSortOrder.toLowerCase());
+        if (!TextUtils.equals("Choose Sort Order",filterSortOrder)) {
+            p.put("sort",filterSortOrder.toLowerCase());
+        }
         if (filterDate != -1 ) {
             final Calendar c = Calendar.getInstance();
             SimpleDateFormat sdFormat = new SimpleDateFormat("yyyyMMdd");

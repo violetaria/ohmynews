@@ -3,6 +3,7 @@ package com.getlosthere.ohmynews.activities;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -18,6 +19,11 @@ public class ArticleActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // Display icon in the toolbar
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setLogo(R.drawable.news);
+        getSupportActionBar().setDisplayUseLogoEnabled(true);
+
         Article article = (Article) getIntent().getSerializableExtra("article");
 
         WebView webView = (WebView) findViewById(R.id.wvArticle);
@@ -32,4 +38,10 @@ public class ArticleActivity extends AppCompatActivity {
         webView.loadUrl(article.getWebUrl());
     }
 
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_search, menu);
+        return true;
+    }
 }

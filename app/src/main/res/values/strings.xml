@@ -4,4 +4,15 @@
     <string name="hint">Enter the search query...</string>
     <string name="search">Search</string>
     <string name="title_activity_article">ArticleActivity</string>
+    <string name="begin_date">Begin Date</string>
+    <string name="sort_order">Sort Order</string>
+    <string name="category">Category</string>
+    <string name="arts">Arts</string>
+    <string name="fashion">Fashion and Style</string>
+    <string name="sports">Sports</string>
+    <string name="sort_order_prompt">Pick a Sort Order</string>
+    <string name="save">Save</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

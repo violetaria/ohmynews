@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorPrimary">#DCD0FF</color>
+    <color name="colorPrimaryDark">#C568DD</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="cursorAccent">#CDCDCD</color>
+    <color name="controlNormal">#000000</color>
+    <color name="controlActivated">#24ABA0</color>
 </resources>

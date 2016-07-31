@@ -13,6 +13,8 @@ import android.webkit.WebViewClient;
 import com.getlosthere.ohmynews.R;
 import com.getlosthere.ohmynews.models.Article;
 
+import org.parceler.Parcels;
+
 public class ArticleActivity extends AppCompatActivity {
 
     @Override
@@ -24,7 +26,9 @@ public class ArticleActivity extends AppCompatActivity {
         getSupportActionBar().setLogo(R.drawable.news);
         getSupportActionBar().setDisplayUseLogoEnabled(true);
 
-        Article article = (Article) getIntent().getSerializableExtra("article");
+        Article article = (Article) Parcels.unwrap(getIntent().getParcelableExtra("article"));
+
+        getSupportActionBar().setTitle(article.getHeadline());
 
         WebView webView = (WebView) findViewById(R.id.wvArticle);
 

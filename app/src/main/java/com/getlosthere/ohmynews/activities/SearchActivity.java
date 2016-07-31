@@ -32,6 +32,7 @@ import com.loopj.android.http.RequestParams;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.parceler.Parcels;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -86,7 +87,7 @@ public class SearchActivity extends AppCompatActivity implements FilterFragment.
                 Article article = articles.get(position);
 
                 // pass in article into the intent
-                i.putExtra("article",article);
+                i.putExtra("article", Parcels.wrap(article));
 
                 // launch the activity
                 startActivity(i);

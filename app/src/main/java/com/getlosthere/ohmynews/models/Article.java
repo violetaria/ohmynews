@@ -3,18 +3,19 @@ package com.getlosthere.ohmynews.models;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.parceler.Parcel;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * Created by violetaria on 7/26/16.
  */
-public class Article implements Serializable {
+@Parcel
+public class Article {
     String webUrl;
     String headline;
     String thumbnail;
-    private final String BASE_URL = "http://www.nytimes.com/";
+    public final String BASE_URL = "http://www.nytimes.com/";
 
     public String getThumbnail() {
         return BASE_URL + thumbnail;
@@ -27,6 +28,11 @@ public class Article implements Serializable {
     public String getHeadline() {
         return headline;
     }
+
+    public Article() {
+
+    }
+
     public Article (JSONObject jsonObject){
         try {
             this.webUrl = jsonObject.getString("web_url");

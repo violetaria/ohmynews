@@ -1,6 +1,9 @@
 package com.getlosthere.ohmynews.activities;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -12,6 +15,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import com.getlosthere.ohmynews.R;
 import com.getlosthere.ohmynews.adapters.ArticleArrayAdapter;
@@ -25,6 +29,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -101,27 +106,32 @@ public class SearchActivity extends AppCompatActivity {
 
     public void loadNewsPageFromAPI(int page) {
         RequestParams params = setupParams(page);
-        NewsAPIClient.get("articlesearch.json",params, new JsonHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                Log.d("DEBUG", response.toString());
+        if (isNetworkAvailable() && isOnline()) {
+            NewsAPIClient.get("articlesearch.json", params, new JsonHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    Log.d("DEBUG", response.toString());
 
-                JSONArray articleJSONResults = null;
-                try {
-                    articleJSONResults = response.getJSONObject("response").getJSONArray("docs");
-                    if(articleJSONResults.length() > 0) {
-                        adapter.addAll(Article.fromJSONArray(articleJSONResults));
-                        adapter.notifyDataSetChanged();
+                    JSONArray articleJSONResults = null;
+                    try {
+                        articleJSONResults = response.getJSONObject("response").getJSONArray("docs");
+                        if (articleJSONResults.length() > 0) {
+                            adapter.addAll(Article.fromJSONArray(articleJSONResults));
+                            adapter.notifyDataSetChanged();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
                 }
-            }
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                super.onFailure(statusCode, headers, throwable, errorResponse);
-            }
-        });
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                    super.onFailure(statusCode, headers, throwable, errorResponse);
+                }
+            });
+        } else {
+            Toast.makeText(getApplicationContext(), "Please check your internet connection", Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
@@ -167,29 +177,52 @@ public class SearchActivity extends AppCompatActivity {
         }
     }
 
+    private Boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
+    }
+
+    public boolean isOnline() {
+        Runtime runtime = Runtime.getRuntime();
+        try {
+            Process ipProcess = runtime.exec("/system/bin/ping -c 1 8.8.8.8");
+            int     exitValue = ipProcess.waitFor();
+            return (exitValue == 0);
+        } catch (IOException e)          { e.printStackTrace(); }
+        catch (InterruptedException e) { e.printStackTrace(); }
+        return false;
+    }
+
     public void onArticleSearch(View view) {
         RequestParams params = setupParams(0);
-        NewsAPIClient.get("articlesearch.json",params, new JsonHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                Log.d("DEBUG", response.toString());
 
-                JSONArray articleJSONResults = null;
+        if (isNetworkAvailable() && isOnline()) {
+            NewsAPIClient.get("articlesearch.json", params, new JsonHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    Log.d("DEBUG", response.toString());
 
-                try {
-                    articleJSONResults = response.getJSONObject("response").getJSONArray("docs");
-                    adapter.clear();
-                    adapter.addAll(Article.fromJSONArray(articleJSONResults));
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                    JSONArray articleJSONResults = null;
+
+                    try {
+                        articleJSONResults = response.getJSONObject("response").getJSONArray("docs");
+                        adapter.clear();
+                        adapter.addAll(Article.fromJSONArray(articleJSONResults));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
 
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                super.onFailure(statusCode, headers, throwable, errorResponse);
-            }
-        });
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                    super.onFailure(statusCode, headers, throwable, errorResponse);
+                }
+            });
+        } else {
+            Toast.makeText(getApplicationContext(), "Please check your internet connection", Toast.LENGTH_LONG).show();
+        }
     }
 
     public RequestParams setupParams(int page){

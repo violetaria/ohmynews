@@ -46,7 +46,7 @@ public class SearchActivity extends AppCompatActivity implements FilterFragment.
     RecyclerView rvResults;
 
     // variables to hold filters
-    private String filterSortOrder = "Choose Sort Order";
+    private String filterSortOrder = "Default";
     private long filterDate = -1;
     private boolean filterArts = false;
     private boolean filterFashion = false;
@@ -146,7 +146,7 @@ public class SearchActivity extends AppCompatActivity implements FilterFragment.
                 int origCount = adapter.getItemCount();
                 articles.clear();
                 adapter.notifyItemRangeRemoved(0,origCount);
-                
+
                 currentQuery = query;
                 if(currentQuery.isEmpty() || currentQuery == ""){
                     Toast.makeText(getApplicationContext(), "Oops, the search was blank!  Try again.", Toast.LENGTH_LONG).show();
@@ -214,17 +214,6 @@ public class SearchActivity extends AppCompatActivity implements FilterFragment.
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK && requestCode == REQUEST_CODE) {
-            filterArts = data.getExtras().getBoolean("arts");
-            filterSports = data.getExtras().getBoolean("sports");
-            filterFashion = data.getExtras().getBoolean("fashion");
-            filterSortOrder = data.getExtras().getString("sort_order");
-            filterDate = data.getExtras().getLong("date",-1);
-        }
-    }
-
     private Boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager
                 = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -248,7 +237,7 @@ public class SearchActivity extends AppCompatActivity implements FilterFragment.
         RequestParams p = new RequestParams();
         p.put("page",page);
         p.put("q",currentQuery);
-        if (!TextUtils.equals("Choose Sort Order",filterSortOrder)) {
+        if (!TextUtils.equals("Default",filterSortOrder)) {
             p.put("sort",filterSortOrder.toLowerCase());
         }
         if (filterDate != -1 ) {

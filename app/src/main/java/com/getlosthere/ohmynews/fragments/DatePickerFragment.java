@@ -12,16 +12,11 @@ import java.util.Calendar;
  */
 public class DatePickerFragment extends DialogFragment {
     private long date;
-    DatePickerDialog.OnDateSetListener ondateSet;
 
     public DatePickerFragment() {
 
     }
 
-
-    public void setCallBack(DatePickerDialog.OnDateSetListener ondate) {
-        ondateSet = ondate;
-    }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -36,9 +31,8 @@ public class DatePickerFragment extends DialogFragment {
         int month = c.get(Calendar.MONTH);
         int day = c.get(Calendar.DAY_OF_MONTH);
 
-//        DatePickerDialog.OnDateSetListener listener = (DatePickerDialog.OnDateSetListener) getParentFragment();
+        DatePickerDialog.OnDateSetListener listener = (DatePickerDialog.OnDateSetListener) getTargetFragment();
 
-        // Create a new instance and return it
-        return new DatePickerDialog(getActivity(), ondateSet, year, month, day);
+        return new DatePickerDialog(getActivity(), listener, year, month, day);
     }
 }

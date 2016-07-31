@@ -24,7 +24,7 @@ import java.util.Calendar;
 /**
  * Created by violetaria on 7/31/16.
  */
-public class FilterFragment extends DialogFragment {
+public class FilterFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener{
     // variables to hold filters
     private String filterSortOrder;
     private long filterDate;
@@ -99,7 +99,7 @@ public class FilterFragment extends DialogFragment {
                 Bundle args = new Bundle();
                 args.putLong("date", filterDate);
                 dateFragment.setArguments(args);
-                dateFragment.setCallBack(ondate);
+//                dateFragment.setCallBack(ondate);
                 dateFragment.setTargetFragment(FilterFragment.this,300);
                 dateFragment.show(fm, "datePicker");
             }
@@ -155,29 +155,16 @@ public class FilterFragment extends DialogFragment {
         etDate.setText(sdFormat.format(c.getTime()));
     }
 
-
-    DatePickerDialog.OnDateSetListener ondate = new DatePickerDialog.OnDateSetListener() {
-
-        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-            // store the values selected into a Calendar instance
-            final Calendar c = Calendar.getInstance();
-            c.set(Calendar.YEAR, year);
-            c.set(Calendar.MONTH, monthOfYear);
-            c.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-            filterDate = c.getTimeInMillis();
-            etDate.setText(sdFormat.format(c.getTime()));
-        }
-    };
-//    // handle the date selected
-//    @Override
-//    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-//        // store the values selected into a Calendar instance
-//        final Calendar c = Calendar.getInstance();
-//        c.set(Calendar.YEAR, year);
-//        c.set(Calendar.MONTH, monthOfYear);
-//        c.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-//        filterDate = c.getTimeInMillis();
-//        etDate.setText(sdFormat.format(c.getTime()));
-//    }
+    // handle the date selected
+    @Override
+    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+        // store the values selected into a Calendar instance
+        final Calendar c = Calendar.getInstance();
+        c.set(Calendar.YEAR, year);
+        c.set(Calendar.MONTH, monthOfYear);
+        c.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+        filterDate = c.getTimeInMillis();
+        etDate.setText(sdFormat.format(c.getTime()));
+    }
 
 }

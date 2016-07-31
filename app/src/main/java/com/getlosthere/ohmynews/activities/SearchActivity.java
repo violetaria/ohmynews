@@ -143,6 +143,10 @@ public class SearchActivity extends AppCompatActivity implements FilterFragment.
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+                int origCount = adapter.getItemCount();
+                articles.clear();
+                adapter.notifyItemRangeRemoved(0,origCount);
+                
                 currentQuery = query;
                 if(currentQuery.isEmpty() || currentQuery == ""){
                     Toast.makeText(getApplicationContext(), "Oops, the search was blank!  Try again.", Toast.LENGTH_LONG).show();
@@ -159,10 +163,7 @@ public class SearchActivity extends AppCompatActivity implements FilterFragment.
 
                                 try {
                                     articleJSONResults = response.getJSONObject("response").getJSONArray("docs");
-                                    int origCount = adapter.getItemCount();
                                     ArrayList<Article> newArticles = Article.fromJSONArray(articleJSONResults);
-                                    articles.clear();
-                                    adapter.notifyItemRangeRemoved(0,origCount);
                                     articles.addAll(newArticles);
                                     adapter.notifyItemRangeInserted(0,newArticles.size());
                                 } catch (JSONException e) {

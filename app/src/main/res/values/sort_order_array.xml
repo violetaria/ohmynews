@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="sort_order_array">
-        <item>Choose Sort Order</item>
+        <item>Default</item>
         <item>Oldest</item>
         <item>Newest</item>
     </string-array>

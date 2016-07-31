@@ -15,12 +15,17 @@ import com.getlosthere.ohmynews.models.Article;
 
 import org.parceler.Parcels;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class ArticleActivity extends AppCompatActivity {
+    @BindView(R.id.wvArticle) WebView webView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_article);
+        ButterKnife.bind(this);
         // Display icon in the toolbar
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setLogo(R.drawable.news);
@@ -30,7 +35,7 @@ public class ArticleActivity extends AppCompatActivity {
 
         getSupportActionBar().setTitle(article.getHeadline());
 
-        WebView webView = (WebView) findViewById(R.id.wvArticle);
+//        WebView webView = (WebView) findViewById(R.id.wvArticle);
 
         webView.setWebViewClient(new WebViewClient() {
             @Override

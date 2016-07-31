@@ -17,6 +17,9 @@ import com.getlosthere.ohmynews.fragments.DatePickerFragment;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class FilterActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener{
     // variables to hold filters
     private String filterSortOrder;
@@ -27,16 +30,17 @@ public class FilterActivity extends AppCompatActivity implements DatePickerDialo
     private int code;
     SimpleDateFormat sdFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-    Spinner spSortOrder;
-    CheckBox cbArts;
-    CheckBox cbFashion;
-    CheckBox cbSports;
-    EditText etDate;
+    @BindView(R.id.spSortOrder) Spinner spSortOrder;
+    @BindView(R.id.cbArts) CheckBox  cbArts;
+    @BindView(R.id.cbFashion) CheckBox  cbFashion;
+    @BindView(R.id.cbSports) CheckBox cbSports;
+    @BindView(R.id.etDate) EditText etDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_filter);
+        ButterKnife.bind(this);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setLogo(R.drawable.news);
         getSupportActionBar().setDisplayUseLogoEnabled(true);
@@ -54,24 +58,14 @@ public class FilterActivity extends AppCompatActivity implements DatePickerDialo
     }
 
     public void setupViews() {
-        etDate = (EditText) findViewById(R.id.etDate);
         if (filterDate != -1 ) {
             final Calendar c = Calendar.getInstance();
             c.setTimeInMillis(filterDate);
             etDate.setText(sdFormat.format(c.getTime()));
         }
-
-        spSortOrder = (Spinner) findViewById(R.id.spSortOrder);
         setSpinnerValue(spSortOrder, filterSortOrder);
-
-        cbArts = (CheckBox) findViewById(R.id.cbArts);
         cbArts.setChecked(filterArts);
-
-        cbFashion = (CheckBox) findViewById(R.id.cbFashion);
         cbFashion.setChecked(filterFashion);
-
-
-        cbSports = (CheckBox) findViewById(R.id.cbSports);
         cbSports.setChecked(filterSports);
     }
 

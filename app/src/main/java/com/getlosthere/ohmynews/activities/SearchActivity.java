@@ -39,12 +39,14 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import cz.msebera.android.httpclient.Header;
 
 public class SearchActivity extends AppCompatActivity implements FilterFragment.FilterListener{
     ArrayList<Article> articles;
     ArticleAdapter adapter;
-    RecyclerView rvResults;
+    @BindView(R.id.rvResults) RecyclerView rvResults;
 
     // variables to hold filters
     private String filterSortOrder = "Default";
@@ -55,11 +57,13 @@ public class SearchActivity extends AppCompatActivity implements FilterFragment.
     private final int REQUEST_CODE = 30;
     String currentQuery;
 
+    @BindView(R.id.toolbar) Toolbar toolbar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        ButterKnife.bind(this);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setLogo(R.drawable.news);
@@ -69,7 +73,6 @@ public class SearchActivity extends AppCompatActivity implements FilterFragment.
     }
 
     public void setupViews() {
-        rvResults = (RecyclerView) findViewById(R.id.rvResults);
         articles = new ArrayList<>();
         adapter = new ArticleAdapter(this, articles);
         rvResults.setAdapter(adapter);

@@ -21,6 +21,10 @@ import com.getlosthere.ohmynews.R;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
+
 /**
  * Created by violetaria on 7/31/16.
  */
@@ -34,12 +38,13 @@ public class FilterFragment extends DialogFragment implements DatePickerDialog.O
     private int code;
     SimpleDateFormat sdFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-    Spinner spSortOrder;
-    CheckBox cbArts;
-    CheckBox cbFashion;
-    CheckBox cbSports;
-    EditText etDate;
-    Button btnSave;
+    @BindView(R.id.spSortOrder) Spinner spSortOrder;
+    @BindView(R.id.cbArts) CheckBox cbArts;
+    @BindView(R.id.cbFashion) CheckBox cbFashion;
+    @BindView(R.id.cbSports) CheckBox cbSports;
+    @BindView(R.id.etDate) EditText etDate;
+    @BindView(R.id.btnSave) Button btnSave;
+    private Unbinder unbinder;
 
     public FilterFragment() {
 
@@ -68,6 +73,8 @@ public class FilterFragment extends DialogFragment implements DatePickerDialog.O
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        unbinder = ButterKnife.bind(this, view);
+
         filterSortOrder = getArguments().getString("sort_order");
         filterDate = getArguments().getLong("date",-1);
         filterArts = getArguments().getBoolean("arts", false);
@@ -82,6 +89,11 @@ public class FilterFragment extends DialogFragment implements DatePickerDialog.O
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
     }
 
+    @Override public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
+    }
+
     // 1. Defines the listener interface with a method passing back data result.
     public interface FilterListener {
         void onFinishedFilterDialog( String sortOrder, Long date, boolean arts, boolean fashion, boolean sports);
@@ -89,7 +101,6 @@ public class FilterFragment extends DialogFragment implements DatePickerDialog.O
 
 
     public void setupViews(View view) {
-        etDate = (EditText) view.findViewById(R.id.etDate);
         etDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -110,20 +121,14 @@ public class FilterFragment extends DialogFragment implements DatePickerDialog.O
             etDate.setText(sdFormat.format(c.getTime()));
         }
 
-        spSortOrder = (Spinner) view.findViewById(R.id.spSortOrder);
         setSpinnerValue(spSortOrder, filterSortOrder);
 
-        cbArts = (CheckBox) view.findViewById(R.id.cbArts);
         cbArts.setChecked(filterArts);
 
-        cbFashion = (CheckBox) view.findViewById(R.id.cbFashion);
         cbFashion.setChecked(filterFashion);
 
-
-        cbSports = (CheckBox) view.findViewById(R.id.cbSports);
         cbSports.setChecked(filterSports);
 
-        btnSave = (Button) view.findViewById(R.id.btnSave);
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

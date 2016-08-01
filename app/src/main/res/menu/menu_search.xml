@@ -5,14 +5,14 @@
 
     <item
         android:id="@+id/miFilter"
-        android:icon="@drawable/filter"
+        android:icon="@drawable/ic_filter_list_black_24dp"
         app:showAsAction="ifRoom|withText"
         android:title="Filter">
     </item>
     <item android:id="@+id/action_search"
           android:orderInCategory="5"
           android:title="Search"
-          android:icon="@android:drawable/ic_menu_search"
+          android:icon="@drawable/magnify"
           app:showAsAction="ifRoom|collapseActionView"
           app:actionViewClass="android.support.v7.widget.SearchView" />
 

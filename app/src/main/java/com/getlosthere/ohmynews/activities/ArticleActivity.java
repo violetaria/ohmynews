@@ -35,8 +35,6 @@ public class ArticleActivity extends AppCompatActivity {
 
         getSupportActionBar().setTitle(article.getHeadline());
 
-//        WebView webView = (WebView) findViewById(R.id.wvArticle);
-
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {

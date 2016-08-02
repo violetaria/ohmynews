@@ -4,7 +4,6 @@
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
               xmlns:tools="http://schemas.android.com/tools">
-
     <com.getlosthere.ohmynews.helpers.DynamicHeightImageView
         android:layout_width="75dp"
         android:layout_height="75dp"

@@ -20,7 +20,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.getlosthere.ohmynews.R;
-import com.getlosthere.ohmynews.adapters.ArticleAdapter;
+import com.getlosthere.ohmynews.adapters.ComplexArticleAdapter;
 import com.getlosthere.ohmynews.clients.NewsAPIClient;
 import com.getlosthere.ohmynews.fragments.FilterFragment;
 import com.getlosthere.ohmynews.helpers.ItemClickSupport;
@@ -44,8 +44,8 @@ import butterknife.ButterKnife;
 import cz.msebera.android.httpclient.Header;
 
 public class SearchActivity extends AppCompatActivity implements FilterFragment.FilterListener{
-    ArrayList<Article> articles;
-    ArticleAdapter adapter;
+    ArrayList<Object> articles;
+    ComplexArticleAdapter adapter;
     @BindView(R.id.rvResults) RecyclerView rvResults;
 
     // variables to hold filters
@@ -74,10 +74,10 @@ public class SearchActivity extends AppCompatActivity implements FilterFragment.
 
     public void setupViews() {
         articles = new ArrayList<>();
-        adapter = new ArticleAdapter(this, articles);
+        adapter = new ComplexArticleAdapter(articles);
         rvResults.setAdapter(adapter);
         StaggeredGridLayoutManager gridLayoutManager =
-                new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL);
+                new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
         rvResults.setLayoutManager(gridLayoutManager);
 
         ItemClickSupport.addTo(rvResults).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
@@ -87,7 +87,7 @@ public class SearchActivity extends AppCompatActivity implements FilterFragment.
                 Intent i = new Intent(getApplicationContext(), ArticleActivity.class);
 
                 // get article to display
-                Article article = articles.get(position);
+                Article article = (Article) articles.get(position);
 
                 // pass in article into the intent
                 i.putExtra("article", Parcels.wrap(article));
